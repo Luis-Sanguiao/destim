@@ -31,6 +31,11 @@
   x$parameters$transitions <-
     (x$parameters$reducedparams$transmatrix %*%
       matrix(c(x$parameters$reducedparams$params, 1), ncol = 1)) [,]
+  if (length(which(x$parameters$transitions < 0)) > 0) {
+    warning(paste0("Parameters outside the feasible region. Negative transition ",
+                   "probabilities will be set to zero."))
+    x$parameters$transitions[which(x$parameters$transitions < 0)] <- 0
+  }
   return(x)
 }
 
