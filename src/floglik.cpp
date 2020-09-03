@@ -68,11 +68,10 @@ double fmultiloglik(SEXP & TM, Eigen::Map<Eigen::VectorXd> values, const Eigen::
     else
       smat.col(j) = emat.col(obs(j,i)).cwiseProduct(smatinit.col(j));
   }
-
   values = transmatrix.rightCols(1) + transmatrix.leftCols(rparams.size()) * rparams ;
 
-  isum = VectorXd::Ones(smat.cols()) * smat;
-  output += isum.log().sum();
+  isum = smat.transpose() * VectorXd::Ones(smat.rows());
+  output += isum.array().log().sum();
   for (j = 0; j < obs.nrow(); ++j)
     smat.col(j) = smat.col(j) / isum(j);
 
@@ -80,10 +79,10 @@ double fmultiloglik(SEXP & TM, Eigen::Map<Eigen::VectorXd> values, const Eigen::
     smat = tmat.transpose() * smat;
     for (j = 0; j < obs.nrow(); ++j)
       if (!IntegerVector::is_na(obs(j, i)))
-        smat.col(j) = emat.col(obs(j, i)).cwiseProduct(emat.col(j));
+        smat.col(j) = emat.col(obs(j, i)).cwiseProduct(smat.col(j));
 
-    isum = VectorXd::Ones(smat.cols()) * smat;
-    output += isum.log().sum();
+    isum = smat.transpose() * VectorXd::Ones(smat.rows());
+    output += isum.array().log().sum();
     for (j = 0; j < obs.nrow(); ++j)
       smat.col(j) = smat.col(j) / isum(j);
   }
